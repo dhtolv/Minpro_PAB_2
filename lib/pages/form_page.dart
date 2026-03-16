@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
+import '../models.dart';
 import 'pilih_page.dart';
+import '../services/booking_service.dart';
 
 class FormPage extends StatefulWidget {
   final Booking? existing;
@@ -12,9 +13,10 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
+  final BookingService service = BookingService();
 
   late final TextEditingController namaC;
-  late final TextEditingController noHpC; // ✅ tambah
+  late final TextEditingController noHpC;
   late final TextEditingController lapanganC;
   late final TextEditingController tanggalC;
 
@@ -24,9 +26,7 @@ class _FormPageState extends State<FormPage> {
   void initState() {
     super.initState();
     namaC = TextEditingController(text: widget.existing?.nama ?? '');
-    noHpC = TextEditingController(
-      text: widget.existing?.noHp ?? '',
-    ); // ✅ tambah
+    noHpC = TextEditingController(text: widget.existing?.noHp ?? '');
     lapanganC = TextEditingController(text: widget.existing?.lapangan ?? '');
     tanggalC = TextEditingController(text: widget.existing?.tanggal ?? '');
   }
@@ -34,7 +34,7 @@ class _FormPageState extends State<FormPage> {
   @override
   void dispose() {
     namaC.dispose();
-    noHpC.dispose(); // ✅ tambah
+    noHpC.dispose();
     lapanganC.dispose();
     tanggalC.dispose();
     super.dispose();
@@ -68,18 +68,32 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    Navigator.pop(
-      context,
-      Booking(
-        nama: namaC.text.trim(),
-        noHp: noHpC.text.trim(), // ✅ tambah
-        lapangan: lapanganC.text.trim(),
-        tanggal: tanggalC.text.trim(),
-      ),
+    final booking = Booking(
+      id: widget.existing?.id,
+      nama: namaC.text.trim(),
+      noHp: noHpC.text.trim(),
+      lapangan: lapanganC.text.trim(),
+      tanggal: tanggalC.text.trim(),
     );
+
+    try {
+      if (isEdit) {
+        await service.updateBooking(booking);
+      } else {
+        await service.addBooking(booking);
+      }
+
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal menyimpan data: $e')));
+    }
   }
 
   @override
@@ -101,7 +115,6 @@ class _FormPageState extends State<FormPage> {
                   ),
                   const SizedBox(height: 12),
 
-                  // TextField 1 - Nama
                   TextFormField(
                     controller: namaC,
                     textInputAction: TextInputAction.next,
@@ -114,7 +127,6 @@ class _FormPageState extends State<FormPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // ✅ TextField 2 - Nomor Telepon
                   TextFormField(
                     controller: noHpC,
                     keyboardType: TextInputType.phone,
@@ -136,7 +148,6 @@ class _FormPageState extends State<FormPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // TextField 3 - Lapangan
                   TextFormField(
                     controller: lapanganC,
                     readOnly: true,
@@ -153,7 +164,6 @@ class _FormPageState extends State<FormPage> {
                   ),
                   const SizedBox(height: 10),
 
-                  // TextField 4 - Tanggal
                   TextFormField(
                     controller: tanggalC,
                     readOnly: true,

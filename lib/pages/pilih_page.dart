@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'models.dart';
+import '../models.dart';
 
 class PilihPage extends StatelessWidget {
   const PilihPage({super.key});
@@ -27,7 +27,7 @@ class PilihPage extends StatelessWidget {
             crossAxisCount: 3,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            mainAxisExtent: 420, // ✅ tinggi tile fix, stabil
+            mainAxisExtent: 420,
           ),
           itemBuilder: (context, i) {
             final lap = daftarLapangan[i];
@@ -62,7 +62,7 @@ class PilihPage extends StatelessWidget {
                         child: Image.asset(
                           lap.imagePath,
                           width: double.infinity,
-                          height: 240, // ✅ pas, tidak bikin overflow
+                          height: 240,
                           fit: BoxFit.cover,
                         ),
                       ),

@@ -1,15 +1,36 @@
 class Booking {
-  String nama;
-  String noHp;
-  String lapangan;
-  String tanggal;
+  final int? id;
+  final String nama;
+  final String noHp;
+  final String lapangan;
+  final String tanggal;
 
   Booking({
+    this.id,
     required this.nama,
     required this.noHp,
     required this.lapangan,
     required this.tanggal,
   });
+
+  factory Booking.fromMap(Map<String, dynamic> map) {
+    return Booking(
+      id: map['id'],
+      nama: map['nama'] ?? '',
+      noHp: map['no_hp'] ?? '',
+      lapangan: map['lapangan'] ?? '',
+      tanggal: map['tanggal'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'nama': nama,
+      'no_hp': noHp,
+      'lapangan': lapangan,
+      'tanggal': tanggal,
+    };
+  }
 }
 
 class Lapangan {
